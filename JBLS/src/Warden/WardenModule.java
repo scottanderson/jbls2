@@ -12,6 +12,7 @@ public class WardenModule{
   private byte[] decryptionSeed    = null;
   private String name              = null;
   private PEFile sc                = null;
+  
   public WardenModule(int size, byte[] md5, byte[] decryptor){
     this.compressedSize = size;
     this.md5Hash        = md5;

@@ -3,7 +3,7 @@
  *
  * Created on March 10, 2004, 9:05 AM
  */
-package Hashing;
+package defunct;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ import util.Out;
  * this as much as possible.
  * @author iago
  */
-public class CheckRevision
+class OldCheckRevision
 {
     /** These are the hashcodes for the various .mpq files. */
     private static final int hashcodes[] = { 0xE7F4CB62, 0xF6A14FFC, 0xAA5504AF, 0x871FCDC2, 0x11BF6A18, 0xC57292E6, 0x7927D27E, 0x2FEC8733 };
