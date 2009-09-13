@@ -1241,7 +1241,7 @@ public class BNLSParse
                      }
 					 
                 case BNLS_WARDEN:
-                	int Useage in.removeByte();
+                	int Useage = in.removeByte();
                 	Cookie = in.removeDWord();
                 	
                 	if (Useage == 0x00)

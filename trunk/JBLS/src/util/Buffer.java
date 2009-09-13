@@ -26,7 +26,7 @@ public class Buffer implements Serializable
     public final int defaultLength = 32;
 
     /** The actual buffer which will hold the data */
-    protected byte[] buffer;
+    protected char[] buffer;
 
     /** The current length of the buffer */
     private int currentLength;
@@ -36,7 +36,7 @@ public class Buffer implements Serializable
     /** Initializes the variables */
     public Buffer()
     {
-        buffer = new byte[defaultLength];
+        buffer = new char[defaultLength];
         currentLength = 0;
         maxLength = defaultLength;
     }
@@ -57,7 +57,7 @@ public class Buffer implements Serializable
     public Buffer(Buffer b)
     {
         this();
-        addBytes(b.getBuffer());
+        addChars(b.getBufferChar());
     }
 
 
@@ -74,9 +74,13 @@ public class Buffer implements Serializable
     public byte[] getBuffer()
     {
         byte[] ret = new byte[currentLength];
-
+        for(int x = 0; x < currentLength; x++) ret[x] = (byte)buffer[x];
+        //System.arraycopy(buffer, 0, ret, 0, currentLength);
+        return ret;
+    }
+    public char[] getBufferChar(){
+        char[] ret = new char[currentLength];
         System.arraycopy(buffer, 0, ret, 0, currentLength);
-
         return ret;
     }
 
@@ -100,7 +104,7 @@ public class Buffer implements Serializable
             System.out.println("Increasing max length to " + maxLength);
 
         // Create a new buffer
-        byte[] newBuffer = new byte[maxLength];
+        char[] newBuffer = new char[maxLength];
 
         // Copy the old buffer into the new buffer
         System.arraycopy(buffer, 0, newBuffer, 0, currentLength);
@@ -115,13 +119,12 @@ public class Buffer implements Serializable
      * @param number    The number of bytes to pull off the beginning.
      * @return          The bytes that were pulled off.
      */
-    protected byte[] remove(int number)
+    protected char[] remove(int number)
     {
-        byte[] ret = new byte[number];
+        char[] ret = new char[number];
         System.arraycopy(buffer, 0, ret, 0, number);
         System.arraycopy(buffer, number, buffer, 0, currentLength - number);
         currentLength -= number;
-
         return ret;
     }
 
@@ -131,8 +134,12 @@ public class Buffer implements Serializable
     public void addByte(byte b)
     {
         verifyLength(1);
-
-        buffer[currentLength++] = b;
+        buffer[currentLength++] = (char)b;
+    }
+    public void addChar(char b)
+    {
+        verifyLength(1);
+        buffer[currentLength++] = (char)b;
     }
 
     /** Removes a single byte from the beginning of the buffer.
@@ -141,6 +148,12 @@ public class Buffer implements Serializable
      *         requested removal.
      */
     public byte removeByte() throws IndexOutOfBoundsException
+    {
+        if(currentLength == 0)
+            throw new IndexOutOfBoundsException("Attempted to remove data from the buffer that wasn't there.");
+        return (byte)(remove(1)[0]);
+    }
+    public char removeChar() throws IndexOutOfBoundsException
     {
         if(currentLength == 0)
             throw new IndexOutOfBoundsException("Attempted to remove data from the buffer that wasn't there.");
@@ -153,7 +166,7 @@ public class Buffer implements Serializable
      */
     public byte byteAt(int index)
     {
-        return buffer[index];
+        return (byte)buffer[index];
     }
 
     /** Adds a word to the buffer (2 bytes, little endian).
@@ -298,12 +311,12 @@ public class Buffer implements Serializable
     {
         StringBuffer s = new StringBuffer();
 
-        byte b = removeByte();
+        char b = removeChar();
 
-        while(b != (byte) 0x00)
+        while(b != (char)0x00)
         {
-            s.append((char) b);
-            b = removeByte();
+            s.append(b);
+            b = removeChar();
         }
 
         return s.toString();
@@ -317,6 +330,11 @@ public class Buffer implements Serializable
         for(int i = 0; i < b.length; i++)
             addByte(b[i]);
     }
+    public void addChars(char[] b)
+    {
+        for(int i = 0; i < b.length; i++)
+            addChar(b[i]);
+    }
 
     /** Removes 'i' bytes from the array and returns them as an array of bytes.
      * @param i The number of bytes to remove.
@@ -324,11 +342,11 @@ public class Buffer implements Serializable
      * @throws IndexOutOfBoundsException If there isn't enough room in the buffer to accomidate the
      *         requested removal.
      */
-    public byte[] removeBytes(int i) throws IndexOutOfBoundsException
-    {
-        return remove(i);
+    public byte[] removeBytes(int i) throws IndexOutOfBoundsException{
+        byte[] ret = new byte[i];
+        for(int x=0;x<i;x++) ret[x] = (byte)(remove(1)[0]);
+        return ret;
     }
-    
 
     /** Adds another buffer to the end of the buffer.  All it actually does is add the bytes
      * of the source to the current buffer.
@@ -345,6 +363,10 @@ public class Buffer implements Serializable
     public void add(byte b)
     {
         addByte(b);
+    }
+    public void add(char b)
+    {
+        addChar(b);
     }
 
     /** Quickly add a short to the buffer.
